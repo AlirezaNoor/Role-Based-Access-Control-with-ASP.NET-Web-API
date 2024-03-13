@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RoleBasedAuthSample.Models;
 using RoleBasedAuthSample.Services;
 using System.IdentityModel.Tokens.Jwt;
+using RoleBasedAuthSample.Dto;
 using RoleBasedAuthSample.Extension;
 
 namespace RoleBasedAuthSample.Controllers
@@ -113,31 +114,49 @@ namespace RoleBasedAuthSample.Controllers
         
  
         [HttpGet]
-        public async Task<IActionResult> Test2()
+        public async Task<ReponseDto> Test2()
         {
+            
           var result=await  _authService.GetbyUserName(User.Identity.Name);
             // Get token from header
             var isAdmin = UserRoleChecker.CheckUserRole(User,3);
             string token = Request.Headers["Authorization"];
-
-            if (token.StartsWith("Bearer"))
+            if (isAdmin==false)
             {
-                token = token.Substring("Bearer ".Length).Trim();
+                return new ReponseDto()
+                {
+                    IsSuccess = false,
+                    Message = "Access denied!"
+
+                };
             }
-            var handler = new JwtSecurityTokenHandler();
-
-            // Returns all claims present in the token
-
-            JwtSecurityToken jwt = handler.ReadJwtToken(token);
-
-            var claims = "List of Claims: \n\n";
-
-            foreach (var claim in jwt.Claims)
+            else
             {
-                claims += $"{claim.Type}: {claim.Value}\n";
-            }
+                if (token.StartsWith("Bearer"))
+                {
+                    token = token.Substring("Bearer ".Length).Trim();
+                }
+                var handler = new JwtSecurityTokenHandler();
 
-            return Ok(claims);
+                // Returns all claims present in the token
+
+                JwtSecurityToken jwt = handler.ReadJwtToken(token);
+
+                var claims = "List of Claims: \n\n";
+
+                foreach (var claim in jwt.Claims)
+                {
+                    claims += $"{claim.Type}: {claim.Value}\n";
+                }
+
+                return new ReponseDto()
+                {
+                    IsSuccess = true,
+                    Message = "this is added",
+                    Data = claims
+                };
+            }
+         
         }
     }
 }
