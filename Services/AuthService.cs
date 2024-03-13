@@ -5,6 +5,7 @@ using RoleBasedAuthSample.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace RoleBasedAuthSample.Services
 {
@@ -12,6 +13,7 @@ namespace RoleBasedAuthSample.Services
     {
         public Task<User> Login(User loginUser);
         public Task<User> Register(User registerUser);
+        public Task<User> GetbyUserName(string name);
     }
 
     public class AuthService : IAuthService
@@ -45,12 +47,14 @@ namespace RoleBasedAuthSample.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.GivenName, user.Name)
+                new Claim(ClaimTypes.GivenName, user.Name),
+              new Claim("accessId", user.AccessId.ToString()) 
             };
             foreach(var role in user.Roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
+   
 
             // Create token descriptor
 
@@ -69,7 +73,6 @@ namespace RoleBasedAuthSample.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             user.Token = tokenHandler.WriteToken(token);
             user.IsActive = true;
-
             return user;
         }
 
@@ -82,6 +85,13 @@ namespace RoleBasedAuthSample.Services
             await _dbContext.SaveChangesAsync();
 
             return registerUser;
+        }
+
+        public async Task<User> GetbyUserName(string name)
+        {
+
+           var result= await _dbContext.Users.FirstOrDefaultAsync(x=>x.UserName==name);
+           return result;
         }
     }
 }

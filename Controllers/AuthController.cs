@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RoleBasedAuthSample.Models;
 using RoleBasedAuthSample.Services;
 using System.IdentityModel.Tokens.Jwt;
+using RoleBasedAuthSample.Extension;
 
 namespace RoleBasedAuthSample.Controllers
 {
@@ -35,7 +36,7 @@ namespace RoleBasedAuthSample.Controllers
 
             // Try login
 
-            var loggedInUser = await _authService.Login(new User(user.UserName, "", user.Password, null));
+            var loggedInUser = await _authService.Login(new User(user.UserName, "", user.Password, null,0));
 
             // Return responses
 
@@ -69,7 +70,7 @@ namespace RoleBasedAuthSample.Controllers
 
             // Try registration
 
-            var registeredUser = await _authService.Register(new User(user.UserName, user.Name, user.Password, user.Roles));
+            var registeredUser = await _authService.Register(new User(user.UserName, user.Name, user.Password, user.Roles,user.AccessId));
 
             // Return responses
 
@@ -112,10 +113,11 @@ namespace RoleBasedAuthSample.Controllers
         
  
         [HttpGet]
-        public IActionResult Test2()
+        public async Task<IActionResult> Test2()
         {
+          var result=await  _authService.GetbyUserName(User.Identity.Name);
             // Get token from header
-
+            var isAdmin = UserRoleChecker.CheckUserRole(User,3);
             string token = Request.Headers["Authorization"];
 
             if (token.StartsWith("Bearer"))

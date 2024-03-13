@@ -11,5 +11,5 @@ However, it's essential to remember that while JWTs provide a convenient mechani
 ## 5- How can use-> sample :How use this example in uer system
 
 - clone prject
-- run it like oder project
+- run it like other project
  

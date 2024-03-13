@@ -8,16 +8,21 @@ namespace RoleBasedAuthSample.Models
         public string UserName { get; set; }
         public string Name { get; set; }
         public List<string>? Roles { get; set; }
+        public int AccessId { get; set; }
         public bool IsActive { get; set; }
         public string? Token { get; set; }
         public string Password { get; set; }
-
-        public User(string userName, string name, string password, List<string>? roles)
+        public User()
+        {
+            Roles = new List<string>();
+        }
+        public User(string userName, string name, string password, List<string>? roles,int accessid)
         {
             UserName = userName;
             Name = name;
             Password = password;
             Roles = roles;
+            AccessId = accessid;
         }
     }
 
@@ -33,5 +38,6 @@ namespace RoleBasedAuthSample.Models
         public string UserName { get; set; } = "";
         public string Password { get; set; } = "";
         public List<string>? Roles { get; set; }
+        public  int  AccessId { get; set; }
     }
 }
